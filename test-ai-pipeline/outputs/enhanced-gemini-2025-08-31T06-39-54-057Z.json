@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-08-31T06:39:54.062Z",
+  "inputText": "AMOXICILLIN CAPSULES 500mg\nRX# 1234567\nDr. Sarah Johnson\nTake one capsule twice daily\nMorning and evening\n30 capsules\nRefills: 2\nPatient: John Doe\nDOB: 01/15/1985\nPHARMACY: MedCenter Pharmacy\n123 Main Street\nPhone: (555) 123-4567",
+  "rawResponse": "```json\n{\n  \"name\": \"Amoxicillin Capsules\",\n  \"dosage\": \"500mg\",\n  \"schedule\": [\"8:00 AM\", \"8:00 PM\"],\n  \"whatItDoes\": \"Amoxicillin is an antibiotic that fights off bacteria causing infections. It helps you get better when you have an infection like an ear infection or a sore throat.\",\n  \"howItHelps\": \"It works by killing the bacteria that are making you sick.  This helps your body get better faster.\",\n  \"commonSideEffects\": [\n    \"Some people get a tummy ache or diarrhea.\",\n    \"You might also feel a little sick to your stomach.\"\n  ],\n  \"seriousSideEffects\": [\n    \"If you have a rash, trouble breathing, or your face or throat swells up, call 911 or go to the hospital right away. This could be a serious allergic reaction.\",\n    \"If you notice anything unusual or feel very sick, please call your doctor.\"\n  ],\n  \"interactions\": [\n    \"Tell your doctor about all the medicines you are taking, including vitamins. Some medicines don't work well together.\",\n    \"It's okay to eat with amoxicillin.\"\n  ],\n  \"importantTips\": [\n    \"Take your amoxicillin exactly as your doctor told you. Don't stop taking it early, even if you feel better. Finish all the medicine.\",\n    \"Always take this medicine with a glass of water.\",\n    \"Store your medicine in a cool, dry place, away from kids.\"\n  ],\n  \"whenToCallDoctor\": [\n    \"Call your doctor if you still feel sick after finishing the medicine, your symptoms get worse, or you notice any new symptoms.\",\n    \"If you have any questions or concerns, don't hesitate to contact your doctor.\"\n  ]\n}\n```\n",
+  "cleanedResponse": "{\n  \"name\": \"Amoxicillin Capsules\",\n  \"dosage\": \"500mg\",\n  \"schedule\": [\"8:00 AM\", \"8:00 PM\"],\n  \"whatItDoes\": \"Amoxicillin is an antibiotic that fights off bacteria causing infections. It helps you get better when you have an infection like an ear infection or a sore throat.\",\n  \"howItHelps\": \"It works by killing the bacteria that are making you sick.  This helps your body get better faster.\",\n  \"commonSideEffects\": [\n    \"Some people get a tummy ache or diarrhea.\",\n    \"You might also feel a little sick to your stomach.\"\n  ],\n  \"seriousSideEffects\": [\n    \"If you have a rash, trouble breathing, or your face or throat swells up, call 911 or go to the hospital right away. This could be a serious allergic reaction.\",\n    \"If you notice anything unusual or feel very sick, please call your doctor.\"\n  ],\n  \"interactions\": [\n    \"Tell your doctor about all the medicines you are taking, including vitamins. Some medicines don't work well together.\",\n    \"It's okay to eat with amoxicillin.\"\n  ],\n  \"importantTips\": [\n    \"Take your amoxicillin exactly as your doctor told you. Don't stop taking it early, even if you feel better. Finish all the medicine.\",\n    \"Always take this medicine with a glass of water.\",\n    \"Store your medicine in a cool, dry place, away from kids.\"\n  ],\n  \"whenToCallDoctor\": [\n    \"Call your doctor if you still feel sick after finishing the medicine, your symptoms get worse, or you notice any new symptoms.\",\n    \"If you have any questions or concerns, don't hesitate to contact your doctor.\"\n  ]\n}",
+  "parsedData": {
+    "name": "Amoxicillin Capsules",
+    "dosage": "500mg",
+    "schedule": [
+      "8:00 AM",
+      "8:00 PM"
+    ],
+    "whatItDoes": "Amoxicillin is an antibiotic that fights off bacteria causing infections. It helps you get better when you have an infection like an ear infection or a sore throat.",
+    "howItHelps": "It works by killing the bacteria that are making you sick.  This helps your body get better faster.",
+    "commonSideEffects": [
+      "Some people get a tummy ache or diarrhea.",
+      "You might also feel a little sick to your stomach."
+    ],
+    "seriousSideEffects": [
+      "If you have a rash, trouble breathing, or your face or throat swells up, call 911 or go to the hospital right away. This could be a serious allergic reaction.",
+      "If you notice anything unusual or feel very sick, please call your doctor."
+    ],
+    "interactions": [
+      "Tell your doctor about all the medicines you are taking, including vitamins. Some medicines don't work well together.",
+      "It's okay to eat with amoxicillin."
+    ],
+    "importantTips": [
+      "Take your amoxicillin exactly as your doctor told you. Don't stop taking it early, even if you feel better. Finish all the medicine.",
+      "Always take this medicine with a glass of water.",
+      "Store your medicine in a cool, dry place, away from kids."
+    ],
+    "whenToCallDoctor": [
+      "Call your doctor if you still feel sick after finishing the medicine, your symptoms get worse, or you notice any new symptoms.",
+      "If you have any questions or concerns, don't hesitate to contact your doctor."
+    ]
+  },
+  "success": true,
+  "enhancedFeatures": [
+    "Simple language for all ages",
+    "Comprehensive side effects",
+    "Drug interactions",
+    "Safety tips",
+    "When to call doctor"
+  ]
+}

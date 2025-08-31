@@ -1,75 +1,113 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { DateTracker } from '../../components/DateTracker';
+import { MedicationCard } from '../../components/MedicationCard';
+import { PlaceholderIcon } from '../../components/PlaceholderIcons';
+import { MedicationContext } from '../../state/MedicationContext';
+import { theme, spacing, fontSizes } from '../../theme/theme';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function HomeScreen(): JSX.Element {
+  const context = useContext(MedicationContext);
+  
+  if (!context) {
+    throw new Error('HomeScreen must be used within a MedicationProvider');
+  }
+  
+  const { medications } = context;
 
-export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Top Branding */}
+        <View style={styles.brandingSection}>
+          <View style={styles.logoRow}>
+            <PlaceholderIcon name="pill" size={32} color={theme.colors.primary} />
+            <Text style={styles.logoText}>MedPAL</Text>
+          </View>
+        </View>
+
+        {/* Date Tracker Section */}
+        <DateTracker />
+
+        {/* To take Today Section */}
+        <View style={styles.sectionHeader}>
+          <View style={styles.headerLeft}>
+            <Text style={styles.toTakeText}>To take</Text>
+            <Text style={styles.todayText}>Today</Text>
+          </View>
+          <Text style={styles.editText}>Edit</Text>
+        </View>
+
+        {/* Medication List */}
+        <View style={styles.medicationList}>
+          {medications.map((medication) => (
+            <MedicationCard key={medication.id} medication={medication} />
+          ))}
+        </View>
+
+        {/* Bottom spacing for tab bar */}
+        <View style={styles.bottomSpacing} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  brandingSection: {
+    paddingHorizontal: spacing.global,
+    paddingTop: spacing.vertical,
+    paddingBottom: spacing.vertical / 2,
+  },
+  logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  logoText: {
+    fontSize: fontSizes.h1,
+    fontWeight: '700',
+    color: theme.colors.primary,
+    marginLeft: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.global,
+    marginTop: spacing.vertical,
+    marginBottom: spacing.vertical,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  toTakeText: {
+    fontSize: fontSizes.h1,
+    fontWeight: '700',
+    color: theme.colors.onSurface,
+    marginRight: 8,
+  },
+  todayText: {
+    fontSize: fontSizes.h1,
+    fontWeight: '700',
+    color: theme.colors.primary,
+  },
+  editText: {
+    fontSize: fontSizes.body,
+    color: theme.colors.secondary,
+    fontWeight: '500',
+  },
+  medicationList: {
+    flex: 1,
+  },
+  bottomSpacing: {
+    height: 120, // Space for tab bar
   },
 });
