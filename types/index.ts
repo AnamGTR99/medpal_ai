@@ -16,3 +16,14 @@ export interface MedicationContextType {
   medications: Medication[];
   addMedication: (med: Omit<Medication, 'id'>) => void;
 }
+
+export interface ScannedData {
+  name: string;
+  doses: string; // e.g., "1 pill"
+  instructions: string; // e.g., "after meal", "before food", "with water"
+  frequency: string; // e.g., "Twice daily"
+  treatment: string; // For the short "Treatment:" line
+  sideEffects: string; // For the short "Possible Side Effects:" line
+  detailedDescription: string; // The original full paragraph for the toggle view
+  imageUri: string; // A local URI for the captured image
+}

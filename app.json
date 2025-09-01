@@ -8,6 +8,10 @@
     "scheme": "medpalhackathon",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "extra": {
+      "GOOGLE_VISION_API_KEY": "AIzaSyC5tGF31QWIKSERP78sN6rQ4zuGdc2VMLI",
+      "GOOGLE_GEMINI_API_KEY": "AIzaSyC5tGF31QWIKSERP78sN6rQ4zuGdc2VMLI"
+    },
     "ios": {
       "supportsTablet": true
     },

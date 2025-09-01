@@ -1,82 +1,75 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { PlaceholderIcon } from '../components/PlaceholderIcons';
-import { ScanConfirmModal } from '../components/ScanConfirmModal';
-import { processImage, ScannedData } from '../services/AIService';
 import { theme, spacing, fontSizes } from '../theme/theme';
 
 export default function ScanModal(): JSX.Element {
   const router = useRouter();
   const cameraRef = useRef<CameraView>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
   
   const [permission, requestPermission] = useCameraPermissions();
-  const [isLoading, setIsLoading] = useState(false);
-  const [scannedData, setScannedData] = useState<ScannedData | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Safe navigation function with fallback
+  // Navigate back to home (tabs)
   const navigateBack = () => {
     try {
-      // Use setTimeout to ensure router is ready
-      setTimeout(() => {
-        if (router && typeof router.back === 'function') {
-          router.back();
-        } else if (router && typeof router.replace === 'function') {
-          router.replace('/(tabs)');
-        } else {
-          console.warn('Router navigation not available');
-        }
-      }, 0);
+      console.log('🏠 Navigating back to home from scan modal');
+      router.replace('/(tabs)');
     } catch (error) {
       console.error('Navigation error:', error);
     }
   };
 
   const handleCapture = async () => {
-    if (!cameraRef.current) return;
+    if (!cameraRef.current || isCapturing) return;
+    
+    setIsCapturing(true);
+    
+    // Clear any previous scan data
+    global.capturedImageUri = null;
+    global.capturedImageBase64 = null;
     
     try {
-      setIsLoading(true);
-      console.log('📸 Taking picture...');
+      console.log('📸 Starting image capture...');
       
+      // Capture image first, then navigate
       const photo = await cameraRef.current.takePictureAsync({ 
         base64: true,
         quality: 0.8,
       });
       
-      if (!photo?.base64) {
-        throw new Error('Failed to capture image');
-      }
-      
-      console.log('🔍 Processing image with AI...');
-      const result = await processImage(photo.base64);
-      
-      if (result) {
-        console.log('✅ AI processing successful:', result);
-        setScannedData(result);
-        setIsModalVisible(true);
+      if (photo?.uri && photo?.base64) {
+        // Store both URI and base64 globally for later use
+        global.capturedImageUri = photo.uri;
+        global.capturedImageBase64 = photo.base64;
+        console.log('✅ Picture captured and stored (URI + base64)');
+        
+        // Navigate to processing screen after image is captured
+        console.log('🚀 Navigating to processing screen with image data');
+        router.replace({
+          pathname: '/processing'
+        });
       } else {
-        console.log('❌ AI processing failed');
+        throw new Error('Failed to capture image');
       }
     } catch (error) {
       console.error('❌ Error during capture:', error);
-    } finally {
-      setIsLoading(false);
+      setIsCapturing(false);
     }
   };
 
-  const handleConfirm = (data: ScannedData) => {
-    console.log('✅ User confirmed medication data:', data);
-    setIsModalVisible(false);
-    navigateBack();
-    // TODO: Save to MedicationContext in next phase
+  // Confirmation handling now moved to confirm-scan screen
+
+  const handleTutorial = () => {
+    console.log('Tutorial button pressed');
+    // TODO: Navigate to tutorial or show tutorial modal
   };
 
-  const handleDismiss = () => {
-    setIsModalVisible(false);
+  const handleGalleryOrFlash = () => {
+    console.log('Gallery/Flash button pressed');
+    // TODO: Open gallery or toggle flash
   };
 
   // Show permission request screen
@@ -115,7 +108,8 @@ export default function ScanModal(): JSX.Element {
         style={styles.camera}
         facing="back"
       >
-        <View style={styles.header}>
+        {/* Close Button - Top Left */}
+        <View style={styles.topBar}>
           <TouchableOpacity 
             onPress={navigateBack}
             style={styles.closeButton}
@@ -128,40 +122,53 @@ export default function ScanModal(): JSX.Element {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.instructionsContainer}>
-          <Text style={styles.instructionsText}>
-            Point your camera at the medication label
+        {/* Top Guide Message */}
+        <View style={styles.guideMessageContainer}>
+          <Text style={styles.guideMessage}>
+            Place label inside the frame
           </Text>
         </View>
 
-        <View style={styles.captureContainer}>
+        {/* Scanning Frame Overlay */}
+        <View style={styles.frameContainer}>
+          <View style={styles.scanningFrame} />
+        </View>
+
+        {/* Tutorial Button */}
+        <View style={styles.tutorialContainer}>
           <TouchableOpacity 
-            style={styles.captureButton}
-            onPress={handleCapture}
-            disabled={isLoading}
+            style={styles.tutorialButton}
+            onPress={handleTutorial}
           >
-            <View style={styles.captureButtonInner} />
+            <Text style={styles.tutorialButtonText}>
+              Need a tutorial?
+            </Text>
           </TouchableOpacity>
         </View>
-      </CameraView>
 
-      {/* Loading Overlay */}
-      {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-            <Text style={styles.loadingText}>Analyzing medication...</Text>
-          </View>
+        {/* Bottom Capture Buttons */}
+        <View style={styles.bottomButtonsContainer}>
+          <TouchableOpacity 
+            style={styles.leftButton}
+            onPress={handleGalleryOrFlash}
+          >
+            <Text style={styles.leftButtonText}>+</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.scanButton, isCapturing && styles.scanButtonDisabled]}
+            onPress={handleCapture}
+            disabled={isCapturing}
+          >
+            <Text style={styles.scanButtonText}>
+              {isCapturing ? 'Capturing...' : 'Scan'}
+            </Text>
+          </TouchableOpacity>
+          
+          {/* Empty view for spacing */}
+          <View style={styles.rightSpacer} />
         </View>
-      )}
-
-      {/* Confirmation Modal */}
-      <ScanConfirmModal
-        visible={isModalVisible}
-        onDismiss={handleDismiss}
-        onConfirm={handleConfirm}
-        initialData={scannedData}
-      />
+      </CameraView>
     </View>
   );
 }
@@ -174,67 +181,152 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingTop: 50,
-    paddingHorizontal: spacing.global,
+  
+  // Top Bar with Close Button
+  topBar: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    right: 20,
+    zIndex: 10,
   },
   closeButton: {
-    padding: 12,
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-  },
-  instructionsContainer: {
-    position: 'absolute',
-    top: 120,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  instructionsText: {
-    fontSize: fontSizes.h2,
-    color: 'white',
-    textAlign: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  captureContainer: {
-    position: 'absolute',
-    bottom: 60,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  captureButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
+  },
+
+  // Top Guide Message
+  guideMessageContainer: {
+    position: 'absolute',
+    top: 120,
+    left: 40,
+    right: 40,
+    zIndex: 5,
+    alignItems: 'center',
+  },
+  guideMessage: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+
+  // Scanning Frame
+  frameContainer: {
+    position: 'absolute',
+    top: 200,
+    left: '10%',
+    right: '10%',
+    height: 240,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 3,
+  },
+  scanningFrame: {
+    width: '100%',
+    height: '100%',
+    borderWidth: 3,
+    borderColor: '#9C27B0',
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    shadowColor: '#9C27B0',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 0,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 15,
   },
-  captureButtonInner: {
+
+  // Tutorial Button
+  tutorialContainer: {
+    position: 'absolute',
+    top: 480,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 5,
+  },
+  tutorialButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+  },
+  tutorialButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '400',
+  },
+
+  // Bottom Buttons
+  bottomButtonsContainer: {
+    position: 'absolute',
+    bottom: 60,
+    left: 40,
+    right: 40,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  leftButton: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  leftButtonText: {
+    color: 'white',
+    fontSize: 30,
+    fontWeight: '300',
+  },
+  scanButton: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 30,
+    shadowColor: theme.colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  scanButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  scanButtonDisabled: {
+    backgroundColor: 'rgba(156, 39, 176, 0.5)',
+    opacity: 0.7,
+  },
+  rightSpacer: {
+    width: 60,
+  },
+
+  // Loading Overlay
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 20,
   },
   loadingContainer: {
     backgroundColor: 'white',
@@ -247,6 +339,8 @@ const styles = StyleSheet.create({
     color: theme.colors.onSurface,
     marginTop: 16,
   },
+
+  // Permission Screens
   permissionContainer: {
     flex: 1,
     justifyContent: 'center',

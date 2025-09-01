@@ -1,4 +1,4 @@
-import { Medication } from '../types';
+import { Medication, ScannedData } from '../types';
 
 export const demoData: Medication[] = [
   {
@@ -26,3 +26,14 @@ export const demoData: Medication[] = [
     schedule: [{ time: '9:00pm', taken: false }],
   },
 ];
+
+export const demoScannedData: ScannedData = {
+  name: 'Roxithromycin',
+  doses: '1 Pill',
+  instructions: 'after meal',
+  frequency: 'Twice Daily',
+  treatment: 'Respiratory tract, urinary and soft tissue infections',
+  sideEffects: 'Nausea, vomiting, abdominal pain',
+  detailedDescription: 'Roxithromycin is a macrolide antibiotic used to treat respiratory tract, urinary and soft tissue infections. Possible side effects include nausea, vomiting, and abdominal pain.',
+  imageUri: 'https://via.placeholder.com/120x120/E8E8E8/666666?text=RX', // Placeholder image URL
+};

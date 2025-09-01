@@ -1,12 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { API_CONFIG, VISION_API_ENDPOINT } from '../config';
-
-export interface ScannedData {
-  name: string;
-  dosage: string;
-  summary: string;
-  schedule: string[]; // Array of times, e.g., ["09:00 AM", "09:00 PM"]
-}
+import { ScannedData } from '../types';
 
 // Initialize Google Generative AI
 const genAI = new GoogleGenerativeAI(API_CONFIG.GOOGLE_GEMINI_API_KEY);
@@ -19,14 +13,20 @@ export async function processImage(base64Image: string): Promise<ScannedData | n
       // Return demo data for testing purposes
       return {
         name: "DEMO MEDICATION",
-        dosage: "10mg",
-        summary: "This is demo data - please configure your API keys",
-        schedule: ["09:00 AM", "09:00 PM"]
+        doses: "1 Pill",
+        instructions: "after meal",
+        frequency: "Twice Daily",
+        treatment: "Demo condition - please configure your API keys",
+        sideEffects: "Demo side effects",
+        detailedDescription: "This is demo data - please configure your API keys in config.ts",
+        imageUri: ""
       };
     }
 
     // Step 1: Google Cloud Vision API Call (OCR)
     console.log('🔍 Starting OCR with Google Vision API...');
+    console.log('📊 Base64 image length:', base64Image ? base64Image.length : 'null');
+    console.log('📊 Base64 starts with:', base64Image ? base64Image.substring(0, 50) + '...' : 'null');
     
     const visionResponse = await fetch(`${VISION_API_ENDPOINT}?key=${API_CONFIG.GOOGLE_VISION_API_KEY}`, {
       method: 'POST',
@@ -41,8 +41,12 @@ export async function processImage(base64Image: string): Promise<ScannedData | n
       })
     });
 
+    console.log('📡 Vision API response status:', visionResponse.status);
+
     if (!visionResponse.ok) {
-      throw new Error(`Vision API error: ${visionResponse.status}`);
+      const errorText = await visionResponse.text();
+      console.error('❌ Vision API error details:', errorText);
+      throw new Error(`Vision API error: ${visionResponse.status} - ${errorText}`);
     }
 
     const visionData = await visionResponse.json();
@@ -59,13 +63,68 @@ export async function processImage(base64Image: string): Promise<ScannedData | n
     
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     
-    const prompt = `You are a medical information parser. Analyze the OCR text from a prescription label and extract the medication's name, dosage, and intake schedule into a structured JSON object. Today's date is August 31, 2025. Infer schedule times from phrases like 'morning' (09:00), 'after lunch' (13:00), 'night' (21:00), or 'twice a day' (09:00, 21:00). Your entire response must be ONLY the JSON object.
+    const prompt = `You are analyzing text from a scanned image. Extract information about the product and provide relevant health/usage details.
 
-**JSON Output Requirements:**
-- "name": The medication name.
-- "dosage": The dosage string (e.g., "20mg").
-- "summary": A simple, one-sentence summary of what the medication is typically for.
-- "schedule": An array of time strings in "HH:MM AM/PM" format.
+**Instructions:**
+1. Identify the product from the text
+2. Provide health benefits, uses, or effects if any exist
+3. Include potential side effects or risks if applicable
+4. Your response must ALWAYS be ONLY a valid JSON object
+
+**Required JSON Fields (always include):**
+- "name": Product name from the text
+- "doses": Dose/serving info if applicable, otherwise "Not specified"
+- "instructions": Usage instructions if mentioned, otherwise empty string
+- "frequency": How often to use/take if mentioned, otherwise "Not specified" 
+- "treatment": What it helps with, treats, or is used for (be specific about actual benefits)
+- "sideEffects": Any potential side effects, risks, or warnings (be realistic about actual risks)
+- "detailedDescription": Full description including purpose, benefits, and any precautions
+
+**Examples:**
+
+**Prescription medication:**
+{
+  "name": "Aspirin",
+  "doses": "100mg",
+  "instructions": "with food", 
+  "frequency": "Daily",
+  "treatment": "Pain relief, heart disease prevention, inflammation reduction",
+  "sideEffects": "Stomach irritation, bleeding risk, allergic reactions",
+  "detailedDescription": "Aspirin is a pain reliever and anti-inflammatory medication used for headaches, heart disease prevention, and reducing inflammation."
+}
+
+**Health product (e.g., vitamins, supplements):**
+{
+  "name": "Vitamin C Tablets",
+  "doses": "1000mg",
+  "instructions": "with water",
+  "frequency": "Daily", 
+  "treatment": "Immune system support, antioxidant protection, wound healing",
+  "sideEffects": "Stomach upset if taken on empty stomach, kidney stones with excessive use",
+  "detailedDescription": "Vitamin C supplement that supports immune function and provides antioxidant benefits."
+}
+
+**Consumable with health effects:**
+{
+  "name": "ZYN Nicotine Pouches",
+  "doses": "Not specified",
+  "instructions": "",
+  "frequency": "Not specified",
+  "treatment": "Nicotine delivery, smoking cessation aid",
+  "sideEffects": "Mouth irritation, nausea, dizziness, headache, increased blood pressure, addiction potential",
+  "detailedDescription": "Smokeless nicotine pouches that deliver nicotine without tobacco, used as an alternative to smoking or for nicotine replacement."
+}
+
+**Regular consumer product:**
+{
+  "name": "Spring Water",
+  "doses": "Not specified",
+  "instructions": "",
+  "frequency": "Not specified", 
+  "treatment": "Hydration, essential for body functions",
+  "sideEffects": "None under normal consumption",
+  "detailedDescription": "Natural spring water for hydration and supporting normal bodily functions."
+}
 
 **Input Text:**
 ${rawText}`;
@@ -76,9 +135,44 @@ ${rawText}`;
 
     console.log('🤖 AI Response:', text);
 
-    // Parse the JSON response
-    const cleanedText = text.replace(/```json|```/g, '').trim();
+    // Parse the JSON response with better error handling
+    let cleanedText = text.replace(/```json|```/g, '').trim();
+    
+    // Remove any markdown formatting
+    if (cleanedText.startsWith('```')) {
+      cleanedText = cleanedText.replace(/```[\w]*\n?/g, '').replace(/```/g, '').trim();
+    }
+    
+    console.log('🧹 Cleaned AI Response:', cleanedText);
+    
+    if (!cleanedText || cleanedText === '{}') {
+      throw new Error('Empty or invalid AI response');
+    }
+    
     const parsedData: ScannedData = JSON.parse(cleanedText);
+    
+    // Validate required fields and provide defaults if missing
+    if (!parsedData.name) {
+      parsedData.name = "Unknown Product";
+    }
+    if (!parsedData.doses) {
+      parsedData.doses = "Not specified";
+    }
+    if (!parsedData.frequency) {
+      parsedData.frequency = "Not specified";
+    }
+    if (!parsedData.treatment) {
+      parsedData.treatment = "Not specified";
+    }
+    if (!parsedData.sideEffects) {
+      parsedData.sideEffects = "Not specified";
+    }
+    if (!parsedData.detailedDescription) {
+      parsedData.detailedDescription = "No description available";
+    }
+    if (!parsedData.instructions) {
+      parsedData.instructions = "";
+    }
 
     console.log('✅ Successfully parsed medication data:', parsedData);
     

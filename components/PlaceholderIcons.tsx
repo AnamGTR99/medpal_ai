@@ -84,6 +84,10 @@ export function PlaceholderIcon({ name, size = 24, color = '#000', focused = fal
     case 'time':
       iconText = '🕐';
       break;
+    case 'volume-high':
+    case 'speaker':
+      iconText = '🔊';
+      break;
     default:
       iconText = '❓';
   }

@@ -16,6 +16,23 @@ export default function RootLayout(): JSX.Element {
             options={{ 
               headerShown: false,
               presentation: 'modal',
+              gestureEnabled: false, // Disable swipe-to-dismiss
+            }} 
+          />
+          <Stack.Screen 
+            name="processing" 
+            options={{ 
+              headerShown: false,
+              presentation: 'modal',
+              gestureEnabled: false, // Disable swipe-to-dismiss
+            }} 
+          />
+          <Stack.Screen 
+            name="confirm-scan" 
+            options={{ 
+              headerShown: false,
+              presentation: 'modal',
+              gestureEnabled: false, // Disable swipe-to-dismiss
             }} 
           />
         </Stack>

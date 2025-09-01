@@ -1,8 +1,8 @@
 # MedPal 💊📱
 
-> **AI-Powered Medication Management for Everyone**
+> **AI-Powered Universal Product Scanner & Health Information App**
 
-MedPal is a comprehensive React Native application that transforms prescription management through cutting-edge AI technology. Simply scan your medication labels with your camera, and MedPal instantly provides detailed, easy-to-understand information about your medications - including side effects, interactions, and safety guidance.
+MedPal is a comprehensive React Native application that uses cutting-edge AI technology to analyze any product through camera scanning. From prescription medications to supplements, consumables, and everyday products - MedPal instantly provides structured health information, usage guidance, benefits, and potential effects for anything you scan.
 
 [![React Native](https://img.shields.io/badge/React%20Native-0.79.6-blue.svg)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo-~53.0.22-black.svg)](https://expo.dev/)
@@ -11,26 +11,36 @@ MedPal is a comprehensive React Native application that transforms prescription 
 
 ## 🌟 Key Features
 
-### 📸 **Smart Prescription Scanning**
+### 📸 **Universal Product Scanning**
 - **Instant OCR**: Powered by Google Cloud Vision API
-- **Live Camera Integration**: Real-time prescription label scanning
-- **High Accuracy**: Advanced text recognition for various prescription formats
+- **Live Camera Integration**: Real-time product label scanning
+- **High Accuracy**: Advanced text recognition for any product type
+- **Immediate Navigation**: Seamless camera-to-results flow with animated loading
 
-### 🧠 **AI-Powered Analysis**
-- **Comprehensive Information**: Medication name, dosage, schedule, and purpose
-- **Safety Insights**: Side effects, interactions, and precautions
-- **Simple Language**: Easy-to-understand explanations for all ages
-- **Emergency Guidance**: Clear warnings and when to seek medical help
+### 🧠 **Smart AI Analysis**
+- **Universal Product Intelligence**: Analyzes medications, supplements, consumables, and everyday products
+- **Structured Information**: Name, doses/servings, frequency, usage instructions
+- **Health Benefits**: Treatment purposes and beneficial effects for any product
+- **Realistic Safety Info**: Actual side effects and risks based on product type
+- **Contextual Responses**: Different information depth based on product category
 
-### 👨‍👩‍👧‍👦 **Family-Friendly Design**
-- **Universal Language**: 5th-grade reading level for accessibility
-- **Visual Clarity**: Clean, intuitive interface design
-- **All Ages**: From children to elderly patients
+### 🎨 **Polished User Experience**
+- **Gesture-Free Navigation**: No accidental swipe-backs, button-only navigation
+- **Toggle Information Display**: Switch between structured summary and detailed description
+- **Real Image Display**: Shows your actual captured photo in results
+- **Loading Animation**: Custom GIF with fallback for smooth transitions
+- **State Management**: Fresh data for each scan, no cached results
+
+### 📱 **Professional Interface**
+- **Material Design**: React Native Paper components with custom theming
+- **Structured Data Cards**: Clean grey boxes for medication information with sub-instructions
+- **Responsive Layout**: Optimized for all screen sizes
+- **Error Handling**: 30-second timeouts with graceful fallbacks
 
 ### 🔒 **Privacy & Security**
-- **Local Processing**: No prescription images stored permanently
-- **Secure APIs**: Encrypted communication with AI services
-- **Privacy First**: Your health data stays private
+- **Local Processing**: Images processed in real-time, not stored permanently
+- **Secure APIs**: Encrypted communication with Google AI services
+- **No Gesture Interference**: Prevents accidental navigation to sensitive states
 
 ## 🚀 Quick Start
 
@@ -114,7 +124,9 @@ MedPal/
 │   │   ├── index.tsx        # Home screen with medication list
 │   │   ├── scan.tsx         # Scan tab (opens camera modal)
 │   │   └── settings.tsx     # Settings and profile
-│   └── scan-modal.tsx       # Full-screen camera interface
+│   ├── scan-modal.tsx       # Full-screen camera interface
+│   ├── processing.tsx       # Loading screen with AI processing
+│   └── confirm-scan.tsx     # Structured results display
 ├── components/              # Reusable UI components
 │   ├── DateTracker.tsx      # Scrollable date selector
 │   ├── MedicationCard.tsx   # Individual medication display
@@ -184,37 +196,48 @@ graph LR
 
 ### Pipeline Stages
 
-1. **📷 Image Capture**: User photographs prescription label
+1. **📷 Image Capture**: User photographs any product label
 2. **🔍 OCR Processing**: Google Vision extracts text with high accuracy
-3. **🧠 AI Analysis**: Gemini AI parses and enriches medication information
-4. **📋 Data Structuring**: Organized into user-friendly format
-5. **👤 Display**: Clear, actionable information presented to user
+3. **🧠 AI Analysis**: Gemini AI analyzes and categorizes product information
+4. **📋 Data Structuring**: Organized into structured, actionable format
+5. **👤 Display**: Clean, toggle-able information presented to user
 
 ### Enhanced Information Output
 
-- **💊 Basic Details**: Name, dosage, schedule
-- **🎯 Purpose**: What the medication treats (simple explanation)  
-- **🔧 Mechanism**: How it works in your body
-- **⚠️ Side Effects**: Common and serious reactions to watch for
-- **🤝 Interactions**: Foods, drinks, and other medications to avoid
-- **💡 Safety Tips**: Best practices for taking medication safely
-- **📞 Emergency Guidance**: When to call doctor or seek immediate help
+- **💊 Basic Details**: Name, doses/servings, frequency, instructions
+- **🎯 Treatment/Benefits**: What the product helps with or is used for
+- **⚠️ Side Effects/Risks**: Realistic effects and warnings based on product type
+- **📋 Structured Display**: Toggle between summary cards and detailed description
+- **📸 Visual Context**: Shows the actual captured image alongside data
+- **🔄 State Management**: Fresh analysis for each scan without cached results
+
+### Product Categories Supported
+
+- **💊 Prescription Medications**: Full medical analysis with dosage and safety info
+- **💉 Supplements & Vitamins**: Health benefits, dosage recommendations, precautions  
+- **🚬 Consumables** (like nicotine products): Effects, usage, and health considerations
+- **🥤 Everyday Products**: Basic benefits (like hydration for water) and safety info
 
 ## 📊 Project Status
 
 ### ✅ Completed Features
 - [x] Complete React Native app with Expo Router
-- [x] Custom tab navigation with elevated scan button
+- [x] Custom tab navigation with elevated scan button  
 - [x] Live camera integration with permissions
 - [x] Google Cloud Vision API integration (OCR)
 - [x] Google Gemini AI integration (analysis)
-- [x] Enhanced medication information pipeline
-- [x] User-friendly confirmation modal
-- [x] Comprehensive testing suite
+- [x] **Universal Product Intelligence**: Analyzes any product type
+- [x] **Structured Results Display**: Toggle between summary and detailed view
+- [x] **Real Image Integration**: Shows captured photos in results
+- [x] **Gesture-Free Navigation**: Button-only flow, no accidental swipe-backs
+- [x] **Enhanced State Management**: Fresh data for each scan
+- [x] **Professional UI**: Grey info boxes with sub-instructions display
+- [x] **Loading Animation**: Custom GIF with fallback support
+- [x] **30-Second Timeouts**: Robust error handling and recovery
+- [x] **Contextual Health Info**: Realistic benefits/risks for all product types
 - [x] TypeScript throughout for type safety
-- [x] Material Design UI components
-- [x] Environment-based configuration
-- [x] Error handling and offline support
+- [x] Material Design UI components with custom theming
+- [x] Environment-based configuration with proper Expo integration
 
 ### 🚧 Future Enhancements
 - [ ] Medication reminders and notifications
