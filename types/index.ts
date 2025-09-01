@@ -8,6 +8,7 @@ export interface Medication {
   name: string; // e.g., "MEDICINE NAME"
   instructions: string; // e.g., "1 pill after eating food"
   icon: string; // The placeholder emoji for the pill icon, e.g., '😀'
+  iconImage?: any; // Optional image source for pill icons (require path)
   iconBackgroundColor: string; // A light, pastel color for the icon's background circle
   schedule: MedicationSchedule[]; // Array for multiple times if needed, for Home Screen only show first
 }

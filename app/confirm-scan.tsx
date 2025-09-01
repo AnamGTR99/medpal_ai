@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, Image } from 'react-native';
 import { Text, Card, Chip, Button } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { PlaceholderIcon } from '../components/PlaceholderIcons';
+import { MedicationContext } from '../state/MedicationContext';
 import { theme, spacing } from '../theme/theme';
 import { ScannedData } from '../types';
 
@@ -10,6 +11,11 @@ export default function ConfirmScanScreen(): JSX.Element {
   const router = useRouter();
   const params = useLocalSearchParams<ScannedData>();
   const [isDetailedViewVisible, setIsDetailedViewVisible] = useState(false);
+  const context = useContext(MedicationContext);
+
+  if (!context) {
+    throw new Error('ConfirmScanScreen must be used within a MedicationProvider');
+  }
 
   const handleHome = () => {
     router.replace('/(tabs)');
@@ -21,8 +27,21 @@ export default function ConfirmScanScreen(): JSX.Element {
   };
 
   const handleAddReminder = () => {
-    console.log('Add Reminder pressed');
-    // TODO: Add medication to context and navigate to home
+    console.log('Add Reminder pressed - Adding medication:', params.name);
+    
+    // Add the scanned medication to today's medication list
+    context.addScannedMedication({
+      name: params.name || 'Unknown Medication',
+      doses: params.doses || '1 dose',
+      instructions: params.instructions || '',
+      frequency: params.frequency || 'Daily',
+      treatment: params.treatment || '',
+      sideEffects: params.sideEffects || '',
+      detailedDescription: params.detailedDescription || '',
+      imageUri: params.imageUri || ''
+    }, 0); // 0 = today
+    
+    // Navigate back to home
     router.replace('/(tabs)');
   };
 
@@ -38,7 +57,11 @@ export default function ConfirmScanScreen(): JSX.Element {
         {/* Header with Home Button */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleHome} style={styles.homeButton}>
-            <PlaceholderIcon name="home" size={24} color={theme.colors.onSurface} />
+            <Image
+              source={require('../assets/images/home.png')}
+              style={styles.homeIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
 
@@ -79,6 +102,11 @@ export default function ConfirmScanScreen(): JSX.Element {
             </View>
 
             <View style={styles.infoBox}>
+              <Image
+                source={require('../assets/images/clock.png')}
+                style={styles.clockIcon}
+                resizeMode="contain"
+              />
               <Text variant="titleMedium" style={styles.infoBoxText}>
                 {params.frequency}
               </Text>
@@ -96,7 +124,7 @@ export default function ConfirmScanScreen(): JSX.Element {
               </Text>
             ) : (
               // STRUCTURED SUMMARY VIEW (default)
-              <View>
+              <View style={styles.summaryContainer}>
                 <View style={styles.summarySection}>
                   <Text variant="bodyLarge" style={styles.summaryLabel}>Treatment:</Text>
                   <Text variant="bodyMedium" style={styles.summaryValue}>{params.treatment}</Text>
@@ -108,13 +136,21 @@ export default function ConfirmScanScreen(): JSX.Element {
               </View>
             )}
 
-            {/* Toggle Button (Question Mark) */}
-            <TouchableOpacity
-              style={styles.toggleButton}
+            {/* Toggle Button (More Info) */}
+            <Button
+              mode="contained"
               onPress={() => setIsDetailedViewVisible(!isDetailedViewVisible)}
+              style={styles.moreInfoButton}
+              contentStyle={styles.moreInfoButtonContent}
+              icon={() => (
+                <Image
+                  source={require('../assets/images/moreinfo.png')}
+                  style={styles.moreInfoIcon}
+                  resizeMode="contain"
+                />
+              )}
             >
-              <Text style={styles.toggleButtonText}>?</Text>
-            </TouchableOpacity>
+            </Button>
 
           </Card.Content>
         </Card>
@@ -166,6 +202,11 @@ const styles = StyleSheet.create({
     padding: 8,
     alignSelf: 'flex-start',
   },
+  homeIcon: {
+    width: 24,
+    height: 24,
+    tintColor: theme.colors.onSurface,
+  },
   title: {
     textAlign: 'center',
     fontWeight: '600',
@@ -198,11 +239,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   infoBox: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: '#FAFAFA',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginBottom: 12,
+    position: 'relative',
   },
   infoBoxText: {
     color: theme.colors.onSurface,
@@ -214,6 +256,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
     fontWeight: '600',
+  },
+  clockIcon: {
+    position: 'absolute',
+    top: 8,
+    left: 12,
+    width: 19,
+    height: 19,
+    tintColor: theme.colors.onSurfaceVariant,
   },
   descriptionCard: {
     backgroundColor: theme.colors.surface,
@@ -227,7 +277,12 @@ const styles = StyleSheet.create({
   descriptionText: {
     lineHeight: 22,
     color: theme.colors.onSurface,
-    marginRight: 40, // Space for speaker icon
+    marginRight: 40, // Space for more info icon
+    marginTop: 10, // Account for icon at top
+  },
+  summaryContainer: {
+    marginRight: 40, // Space for more info icon
+    marginTop: 10, // Account for icon at top
   },
   summarySection: {
     marginBottom: 12,
@@ -241,16 +296,23 @@ const styles = StyleSheet.create({
     color: theme.colors.onSurface,
     lineHeight: 20,
   },
-  toggleButton: {
+  moreInfoButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20, // Moved to where speaker button was
-    padding: 8,
+    top: 15,
+    right: 15,
+    backgroundColor: 'transparent',
+    elevation: 0,
+    width: 37,
+    height: 37,
+    borderRadius: 18.5,
   },
-  toggleButtonText: {
-    fontSize: 24,
-    color: theme.colors.onSurfaceVariant,
-    fontWeight: 'bold',
+  moreInfoButtonContent: {
+    width: 37,
+    height: 37,
+  },
+  moreInfoIcon: {
+    width: 22,
+    height: 22,
   },
   actionButtons: {
     flexDirection: 'row',

@@ -234,10 +234,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderWidth: 3,
-    borderColor: '#9C27B0',
+    borderColor: '#c0c1ff',
     borderRadius: 20,
     backgroundColor: 'transparent',
-    shadowColor: '#9C27B0',
+    shadowColor: '#c0c1ff',
     shadowOffset: {
       width: 0,
       height: 0,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   scanButtonDisabled: {
-    backgroundColor: 'rgba(156, 39, 176, 0.5)',
+    backgroundColor: 'rgba(192, 193, 255, 0.5)',
     opacity: 0.7,
   },
   rightSpacer: {

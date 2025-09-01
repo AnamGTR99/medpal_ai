@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, Image } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
 import { PlaceholderIcon } from '../../components/PlaceholderIcons';
 import { theme, spacing } from '../../theme/theme';
@@ -38,19 +38,27 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               onPress={onPress}
               activeOpacity={0.8}
             >
-              <PlaceholderIcon 
-                name="camera" 
-                size={24} 
-                color="white" 
+              <Image
+                source={require('../../assets/images/scan.png')}
+                style={styles.scanIcon}
+                resizeMode="contain"
               />
             </TouchableOpacity>
           );
         }
 
         // Regular tab buttons
-        const iconName = route.name === 'index' ? 'home' : 'pill';
         const labelText = route.name === 'index' ? 'Home' : 'My Meds';
         const iconColor = isFocused ? theme.colors.primary : '#666';
+        
+        // Get the appropriate image source
+        const getIconImage = () => {
+          if (route.name === 'index') {
+            return require('../../assets/images/home.png');
+          } else {
+            return require('../../assets/images/meds.png');
+          }
+        };
 
         return (
           <TouchableOpacity
@@ -59,11 +67,13 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
             onPress={onPress}
             activeOpacity={0.6}
           >
-            <PlaceholderIcon
-              name={iconName}
-              size={24}
-              color={iconColor}
-              focused={isFocused}
+            <Image
+              source={getIconImage()}
+              style={[
+                styles.tabIcon,
+                { tintColor: iconColor }
+              ]}
+              resizeMode="contain"
             />
             <Text style={[styles.tabLabel, { color: iconColor }]}>
               {labelText}
@@ -132,6 +142,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
   },
+  tabIcon: {
+    width: 24,
+    height: 24,
+  },
   tabLabel: {
     fontSize: 12,
     marginTop: 4,
@@ -153,5 +167,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
     elevation: 8,
+  },
+  scanIcon: {
+    width: 24,
+    height: 24,
   },
 });

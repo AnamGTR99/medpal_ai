@@ -24,6 +24,13 @@ export default function SettingsScreen(): JSX.Element {
             <Paragraph>Track your medication intake history...</Paragraph>
           </Card.Content>
         </Card>
+
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={styles.cardTitle}>Export to PDF</Title>
+            <Paragraph>Generate instant reports of your weekly prescription cycle to any caretaker or specialist doctor</Paragraph>
+          </Card.Content>
+        </Card>
       </View>
     </View>
   );

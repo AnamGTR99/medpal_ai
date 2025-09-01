@@ -8,9 +8,14 @@ interface DateChip {
   day: string;
   fullDate: Date;
   isSelected: boolean;
+  offset: number;
 }
 
-export function DateTracker(): JSX.Element {
+interface DateTrackerProps {
+  onDateChange?: (offset: number) => void;
+}
+
+export function DateTracker({ onDateChange }: DateTrackerProps): JSX.Element {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Generate 5 days starting from today
@@ -27,6 +32,7 @@ export function DateTracker(): JSX.Element {
         day: date.toLocaleDateString('en-US', { weekday: 'short' }),
         fullDate: date,
         isSelected: date.toDateString() === selectedDate.toDateString(),
+        offset: i,
       });
     }
     
@@ -40,11 +46,16 @@ export function DateTracker(): JSX.Element {
     month: 'long' 
   }).replace(/^\w/, c => c.toUpperCase());
 
+  const handleDateSelect = (chip: DateChip) => {
+    setSelectedDate(chip.fullDate);
+    onDateChange?.(chip.offset);
+  };
+
   return (
     <View style={styles.container}>
       {/* Current Date Header */}
       <View style={styles.headerRow}>
-        <Text style={styles.headerText}>Today, {currentDate.replace('Today, ', '')}</Text>
+        <Text style={styles.headerText}>{currentDate}</Text>
         <PlaceholderIcon name="down" size={16} color={theme.colors.secondary} />
       </View>
 
@@ -62,7 +73,7 @@ export function DateTracker(): JSX.Element {
               styles.dateChip,
               chip.isSelected && styles.selectedChip
             ]}
-            onPress={() => setSelectedDate(chip.fullDate)}
+            onPress={() => handleDateSelect(chip)}
             activeOpacity={0.7}
           >
             <Text style={[
@@ -124,7 +135,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectedChip: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: '#c0c1ff',
     shadowOpacity: 0.2,
     elevation: 4,
   },
